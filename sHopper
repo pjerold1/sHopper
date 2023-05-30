@@ -2,15 +2,15 @@ while not game:IsLoaded() do wait(1) end
 wait(2)
 
 settingsconfig = {
-	targetmulti = 3,
+	targetmulti = 0,
 	breakgiantchest = true,
 	breakbigchests = true,
-	breakpresents = false,
+	breakpresents = true,
 	breakvaults = true,
 	ignorepresents = false,
 	autotripledamage = true,
 	autoserverdamage = true,
-	safetyrange = 500, -- If you are within this much studs as another player it will server hop (set to 0 if you dont want it to do this)
+	safetyrange = 0, -- If you are within this much studs as another player it will server hop (set to 0 if you dont want it to do this)
 	webhook = "https://discord.com/api/webhooks/1112598244925657138/FdmT9_U-mESQs-0NrYFRl8GgKNttna0kKZejrLiJyimFsTf2WlnMAECe9dWN9k3e7oHG"
 }
 
