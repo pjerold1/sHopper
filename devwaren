@@ -1,5 +1,6 @@
 while not game:IsLoaded() do wait(1) end
-wait(4)
+wait(2)
+
 settingsconfig = {
 	targetmulti = 3,
 	breakgiantchest = true,
@@ -46,7 +47,7 @@ end)
 
 Lib = require(game:GetService("ReplicatedStorage").Library)
 
-wait(6)
+wait(2)
 
 local function serverHop()
     repeat
