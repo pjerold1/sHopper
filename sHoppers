@@ -1,4 +1,4 @@
-hile not game:IsLoaded() do wait(1) end
+while not game:IsLoaded() do wait(1) end
 wait(2)
 
 settingsconfig = {
