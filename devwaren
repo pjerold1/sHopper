@@ -1,12 +1,34 @@
 while not game:IsLoaded() do wait(1) end
 wait(2)
 
-game:GetService("RunService"):Set3dRenderingEnabled(false)
+settingsconfig = {
+	targetmulti = 3,
+	breakgiantchest = true,
+	breakbigchests = true,
+	breakpresents = false,
+	breakvaults = true,
+	ignorepresents = false,
+	autotripledamage = true,
+	autoserverdamage = true,
+	safetyrange = 0, -- If you are within this much studs as another player it will server hop (set to 0 if you dont want it to do this)
+	webhook = "https://discord.com/api/webhooks/1113085939569401946/CrEQ4oNYIdFWdmLoyzd8P5IYa5V4uOLCk9VZ486x6IKcNx1qsIQR1yJXyIFXmSgXCMNP"
+}
 
-targetmulti = 3 -- If The Multiplier Of A Coin Is Higher Or Equal To This It Will Break It
-breakgiantchest = true -- Weather To Break The Giant Mine Chest Even If Its Below The Multi
-breakbigchests = true -- Weather To Break The Big Mine Chests Even If They Are Below The Multi
-WEBHOOK = "https://discord.com/api/webhooks/1113085939569401946/CrEQ4oNYIdFWdmLoyzd8P5IYa5V4uOLCk9VZ486x6IKcNx1qsIQR1yJXyIFXmSgXCMNP" -- Webhook
+local SettingsJson = game:GetService("HttpService"):JSONEncode(settingsconfig)
+writefile("settings.txt", SettingsJson)
+
+local file = readfile("settings.txt")
+local settings = game:GetService("HttpService"):JSONDecode(file)
+
+local targetmulti = tonumber(settings.targetmulti) or 5
+local breakgiantchest = settings.breakgiantchest or true
+local breakbigchests = settings.breakbigchests or true
+local breakpresents = settings.breakpresents or false
+local breakvaults = settings.breakvaults or false
+local ignorepresents = settings.ignorepresents or false
+local WEBHOOK = settings.webhook or ""
+local AutoTripleDamage = settings.autotripledamage or true
+local AutoServerDamage = settings.autoserverdamage or true
 
 local oldJob = game.JobId
 
@@ -25,7 +47,7 @@ end)
 
 Lib = require(game:GetService("ReplicatedStorage").Library)
 
-wait(6)
+wait(2)
 
 local function serverHop()
     repeat
