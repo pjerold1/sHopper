@@ -2,7 +2,7 @@ while not game:IsLoaded() do wait(1) end
 wait(2)
 
 settingsconfig = {
-	targetmulti = 3,
+	targetmulti = 2,
 	breakgiantchest = true,
 	breakbigchests = true,
 	breakpresents = false,
@@ -11,7 +11,7 @@ settingsconfig = {
 	autotripledamage = true,
 	autoserverdamage = true,
 	safetyrange = 0, -- If you are within this much studs as another player it will server hop (set to 0 if you dont want it to do this)
-	webhook = "https://discord.com/api/webhooks/1113085939569401946/CrEQ4oNYIdFWdmLoyzd8P5IYa5V4uOLCk9VZ486x6IKcNx1qsIQR1yJXyIFXmSgXCMNP"
+	webhook = "https://discord.com/api/webhooks/1112598244925657138/FdmT9_U-mESQs-0NrYFRl8GgKNttna0kKZejrLiJyimFsTf2WlnMAECe9dWN9k3e7oHG"
 }
 
 local SettingsJson = game:GetService("HttpService"):JSONEncode(settingsconfig)
