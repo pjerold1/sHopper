@@ -12,11 +12,19 @@ settingsconfig = {
 	ignorepresents = false,
 	autotripledamage = true,
 	autoserverdamage = true,
-	safetyrange = 0, -- If you are within this much studs as another player it will server hop (set to 0 if you dont want it to do this)
+	safetyrange = 500, -- If you are within this much studs as another player it will server hop (set to 0 if you dont want it to do this)
 	webhook = "https://discord.com/api/webhooks/1112598244925657138/FdmT9_U-mESQs-0NrYFRl8GgKNttna0kKZejrLiJyimFsTf2WlnMAECe9dWN9k3e7oHG",
     timeframewh = "https://discord.com/api/webhooks/1113867652830601226/X2KCWK_oyPd8P4a6KbC6aBRPOAsGmXiiwgLQDDNsCoQyTJCD9SY5AhufJ9BMMLGCAoht",
-    timeframe = 600 -- Seconds
+    timeframe = 120 -- Seconds
 }
+local TimeElapsed = 0
+local timer = coroutine.create(function()
+    while 1 do
+        TimeElapsed = TimeElapsed + 1
+        wait(1)
+    end
+end)
+coroutine.resume(timer)
 
 local SettingsJson = game:GetService("HttpService"):JSONEncode(settingsconfig)
 writefile("settings.txt", SettingsJson)
@@ -115,19 +123,10 @@ coi = coroutine.create(function()
 	end
 end)
 coroutine.resume(coi)
-local TimeElapsed = 0
 local GemsEarned = 0
 local TotalGemsEarned = 0
 local Library = require(game:GetService("ReplicatedStorage").Library)
 local StartingGems = Library.Save.Get().Diamonds
-
-local timer = coroutine.create(function()
-    while 1 do
-        TimeElapsed = TimeElapsed + 1
-        wait(1)
-    end
-end)
-coroutine.resume(timer)
 
 AREATOCHECK = "Mystic Mine"
 function add_suffix(inte)
