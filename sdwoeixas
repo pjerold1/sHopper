@@ -6,7 +6,7 @@ game:GetService("Players").LocalPlayer.Idled:connect(function()
 end)
 
 Settings = {
-    ["On Screen Trackers"] = false,
+    ["On Screen Trackers"] = true,
     ["Performance"] = {
         ["Disable 3D Rendering"] = false,
         ["Diable Orb Rendering"] = true,
