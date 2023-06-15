@@ -1,5 +1,5 @@
 Settings = {
-    ["On Screen Trackers"] = false,
+    ["On Screen Trackers"] = true,
     ["Performance"] = {
         ["Disable 3D Rendering"] = false,
         ["Disable Orb Rendering"] = true,
@@ -11,7 +11,7 @@ Settings = {
     },
     ["Auto Mailbox"] = {
         ["Recipient"] = "YOUR USER HERE", -- Person To Send To
-        ["Min Dias"] = 100000000000, -- Minumum Gems
+        ["Min Dias"] = 100000000, -- Minumum Gems
         ["Enabled"] = false
     },
 	["Multipliers"] = {
@@ -19,13 +19,11 @@ Settings = {
         ["Chest"] = 0,
         ["Small Chest"] = 0,
         ["Vault"] = 0,
-        ["Safe"] = 0,
-        ["Present"] = 0
+        ["Safe"] = 3,
+        ["Present"] = 5
 	},
     ["Webhooks"] = {
-        ["Server Hop Webhook"] = "https://discord.com/api/webhooks/1113085939569401946/CrEQ4oNYIdFWdmLoyzd8P5IYa5V4uOLCk9VZ486x6IKcNx1qsIQR1yJXyIFXmSgXCMNP",
-        ["Time Frame Webhook"] = "https://discord.com/api/webhooks/1113868735929921576/o2wz3s8Xw6lDiKDSYhS11Yq-AiwW_manPzK7-fu_Ehxsq83bSf6tWO75Za27q0Oelgz3",
-        ["Timeframe"] = 600 -- Seconds
+        ["Server Hop Webhook"] = "https://discord.com/api/webhooks/1118967331624861797/ME8ZsNjux5mHz6s-OkLCdKZDjhn8U46rR3eXm-BsX61KlnB5Bz2kM2Xpe1X3h117r3u1",
     },
     ["Pet Team"] = {
         ["Mode"] = "Best", -- Best Or Manual: Best = Highest Power, Manual = All Pets With A Certain Nickname
@@ -33,13 +31,20 @@ Settings = {
     },
     ["Fruit"] = {
         ["Farm Fruit If Low"] = true,
-        ["Min Fruit"] = 120, -- Starts Farming If Below This
-        ["Max Fruit"] = 199, -- Stops Farming Once Above This
+        ["Min Fruit"] = 150, -- Starts Farming If Below This
+        ["Max Fruit"] = 175, -- Stops Farming Once Above This
         ["Mode"] = "Pixel Vault" -- Pixel Vault or Server Hop
     },
     ["Boosts"] = {
         ["Triple Damage"] = true,
         ["Server Damage"] = true
+    },
+    ["Server Hop"] = {
+        ["Min Players"] = 2,
+        ["Max Players"] = 3
+    },
+    ["Safety"] = {
+        ["Max Range"] = 500
     }
 }
 
@@ -59,6 +64,45 @@ if Settings["Performance"]["Disable 3D Rendering"] then game:GetService("RunServ
 
 local totallabelsize = 0
 
+function formatTime(seconds)
+    local hours = math.floor(seconds / 3600)
+    local minutes = math.floor((seconds % 3600) / 60)
+    local secs = seconds % 60
+  
+    local formattedTime = string.format("%02d:%02d:%02d", hours, minutes, secs)
+    return formattedTime
+  end
+
+  function GetActiveBoosts()
+    local lib = require(game.ReplicatedStorage.Library)
+    local boosts = lib.Save.Get().Boosts
+    bS = ""
+    BN = "Triple Damage"
+    if not boosts[BN] then
+        bS = bS .. ":squeeze_bottle: **" .. BN .. ":** " .. "``00:00:00``\n"
+    else
+        bS = bS .. ":squeeze_bottle: **" .. BN .. ":** " .. "``" .. formatTime(boosts[BN]) .. "``\n"
+    end
+    BN = "Triple Coins"
+    if not boosts[BN] then
+        bS = bS .. ":squeeze_bottle: **" .. BN .. ":** " .. "``00:00:00``\n"
+    else
+        bS = bS .. ":squeeze_bottle: **" .. BN .. ":** " .. "``" .. formatTime(boosts[BN]) .. "``\n"
+    end
+    BN = "Super Lucky"
+    if not boosts[BN] then
+        bS = bS .. ":squeeze_bottle: **" .. BN .. ":** " .. "``00:00:00``\n"
+    else
+        bS = bS .. ":squeeze_bottle: **" .. BN .. ":** " .. "``" .. formatTime(boosts[BN]) .. "``\n"
+    end
+    BN = "Ultra Lucky"
+    if not boosts[BN] then
+        bS = bS .. ":squeeze_bottle: **" .. BN .. ":** " .. "``00:00:00``\n"
+    else
+        bS = bS .. ":squeeze_bottle: **" .. BN .. ":** " .. "``" .. formatTime(boosts[BN]) .. "``\n"
+    end
+    return bS
+end
 function makelabel()
     local sg = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)
     
@@ -100,15 +144,6 @@ label2.Position = UDim2.new(0.05, 0, 0.95 - totallabelsize + 0.05 + 0.25)
 label3.Position = UDim2.new(0.05, 0, 0.95 - totallabelsize + 0.05 + 0.5)
 local CoinsLeft = 0
 local TimeElapsed = 0
-local timer = coroutine.create(function()
-    while 1 do
-        TimeElapsed = TimeElapsed + 1
-        label3.Text = "🕒 | Time Elapsed: " .. TimeElapsed .. "s"
-
-        wait(1)
-    end
-end)
-coroutine.resume(timer)
 local coinst = coroutine.create(function()
     while 1 do
         label1.Text = "🌟 | Coins Remaining: " .. CoinsLeft
@@ -121,6 +156,15 @@ local v1 = require(game.ReplicatedStorage:WaitForChild("Framework"):WaitForChild
 while not v1.Loaded do
     game:GetService("RunService").Heartbeat:Wait();
 end;
+local timer = coroutine.create(function()
+    while 1 do
+        TimeElapsed = TimeElapsed + 1
+        label3.Text = "🕒 | Time Elapsed: " .. TimeElapsed .. "s"
+
+        wait(1)
+    end
+end)
+coroutine.resume(timer)
 AREATOCHECK = "Mystic Mine"
 local Network = require(game:GetService("ReplicatedStorage").Library.Client.Network)
 local Fire, Invoke = Network.Fire, Network.Invoke
@@ -355,12 +399,29 @@ function GetOranges()
     return math.floor(FruitLib.Get(game.Players.LocalPlayer, Fruit))
 end
 
+function GetAllFruit()
+    local FruitLib = require(game.ReplicatedStorage.Library.Client.FruitCmds)
+
+    FS = ""
+    FN = "Orange"
+    FE = ":tangerine:"
+    local Fruit = FruitLib.Directory[FN]
+    local amoun = math.floor(FruitLib.Get(game.Players.LocalPlayer, Fruit))
+    FS = FS .. FE .. " **" .. FN .. ":** ``" .. amoun .. "``\n"
+    FN = "Apple"
+    FE = ":apple:"
+    local Fruit = FruitLib.Directory[FN]
+    local amoun = math.floor(FruitLib.Get(game.Players.LocalPlayer, Fruit))
+    FS = FS .. FE .. " **" .. FN .. ":** ``" .. amoun .. "``\n"
+    return FS
+end
+
 function get_coins_in_area(area)
     local allCoins = Invoke("Get Coins") -- this gets every coin in the world you are in
     local coinsInArea = {} -- Make a blank list that will store all the ids of the coins in the area
     
     for coinid,coindata in pairs(allCoins) do -- Loop through every coin in the world
-        if coindata.a == area and not string.find(coindata.n, "Chest") then -- if the area the coin is in is in the area you specify then...
+        if coindata.a == area then -- if the area the coin is in is in the area you specify then...
             table.insert(coinsInArea, coinid) -- add the coin id to the coinsinarea table
         end
     end
@@ -376,9 +437,9 @@ end
 
 function wait_until_broken(id)
     while 1 do
-        wait(0.01)
+        wait()
+        found = false
         for i,v in pairs(debug.getupvalue(getsenv(game.Players.LocalPlayer.PlayerScripts.Scripts.Game.Coins).DestroyAllCoins, 1)) do
-            found = false
             if i == id then
                 found = true
             end
@@ -1458,14 +1519,25 @@ function WH()
             ["content"] = "",
             ["embeds"] = {
 			    {
-			      ["title"] = "Server Hop Stat Update (v3)",
+			      ["title"] = ":pineapple: Server Hop Stat Update (2.0 V1) (Summer Edition) :pineapple:",
 			      ["description"] = "Successfully Broke Everything In Server. Hopping To New Server!",
-			      ["color"] = tonumber(0x0f0063),
+			      ["color"] = tonumber(0xffc16b),
 			      ["fields"] = {
 			        {
-			          ["name"] = "Stats",
-			          ["value"] = ":clock1: **Time Taken:** ``"..TimeElapsed.."s``\n:gem: **Gems Earned:** ``"..add_suffix(GemsEarned).."``\n:gem: **Total Gems Earned:** ``" .. add_suffix(TotalGemsEarned) .. "``\n:map: **Farming:** ``"..AREATOCHECK.."``"
-			        }
+			          ["name"] = ":gem: Gems Earned",
+			          ["value"] = ":clock1: **Time Taken:** ``"..formatTime(TimeElapsed).."``\n:gem: **Gems Earned:** ``"..add_suffix(GemsEarned).."``\n:gem: **Total Gems Earned:** ``" .. add_suffix(TotalGemsEarned) .. "``\n:bank: **Total Balance:** ``" .. add_suffix(Library.Save.Get().Diamonds) .. "``" ,
+                      ["inline"] = true
+			        },
+                    {
+                        ["name"] = ":squeeze_bottle: Active Boosts",
+                        ["value"] = GetActiveBoosts(),
+                        ["inline"] = true
+                    },
+                    {
+                        ["name"] = ":salad: Fruit",
+                        ["value"] = GetAllFruit(),
+                        ["inline"] = true
+                    }
 			      },
 			      ["author"] = {
 			        ["name"] = "Mystic Farmer - Stats"
@@ -1478,7 +1550,7 @@ end
 
 wait(1)
 
-FrTeleportToWorld("Diamond Mine", "Mystic Mine")
+if Library.Save.Get().World ~= "Diamond Mine" then FrTeleportToWorld("Diamond Mine", "Mystic Mine") end
 
 if game.Workspace:FindFirstChild("plat") then game.Workspace.plat:Destroy() end
 local p = Instance.new("Part") 
@@ -1501,6 +1573,78 @@ textLabel.TextScaled = true
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(9043.19141, -34.3321552, 2424.63647, -0.938255966, 7.68024719e-08, 0.345941782, 8.24376656e-08, 1, 1.57588176e-09, -0.345941782, 2.99972136e-08, -0.938255966)
 AllC = Invoke("Get Coins")
 Fire("Performed Teleport")
+local player = game.Players.LocalPlayer
+local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+local detectionRange = Settings["Safety"]["Max Distance"]
+local function isPlayerInRange(player)
+    if player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+        local playerRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+        local playerPosition = playerRootPart and playerRootPart.Position
+        if playerPosition then
+            local playerDistance = (playerPosition - humanoid.RootPart.Position).Magnitude
+            return playerDistance <= detectionRange
+        end
+    end
+    return false
+end
+local function checkNearbyPlayers()
+    for _, otherPlayer in ipairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= player then
+            if isPlayerInRange(otherPlayer) then
+                local function getServerIDs(minPlayers, maxPlayers)
+                    local apiUrl = "https://games.roblox.com/v1/games/[GAME_ID]/servers/Public?sortOrder=Asc&limit=100"
+                    local gameID = game.PlaceId
+                    local serverIDs = {}
+                    local nextPageCursor = ""
+                    local stopSearching = false
+                    
+                    repeat
+                        local url = apiUrl:gsub("%[GAME_ID%]", gameID)
+                        if nextPageCursor ~= "" then
+                            url = url .. "&cursor=" .. nextPageCursor
+                        end
+                        local response = game:HttpGetAsync(url)
+                        local json = game.HttpService:JSONDecode(response)
+                        
+                        for _, server in ipairs(json.data) do
+                            local playerCount = server.playing
+                            if playerCount >= minPlayers and playerCount <= maxPlayers then
+                                table.insert(serverIDs, server.id)
+                            elseif playerCount > maxPlayers then
+                                stopSearching = true
+                                break
+                            end
+                        end
+                        
+                        nextPageCursor = json.nextPageCursor
+                    until nextPageCursor == nil or stopSearching
+                    
+                    return serverIDs
+                end
+                
+                function ServerHop(ServerList)
+                    oldJob = game.JobId
+                    while 1 do
+                        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, ServerList[math.random(1, #ServerList)], game.Players.LocalPlayer)
+                        task.wait(1)
+                        if oldJob ~= game.JobId then break end
+                    end
+                end
+                
+                local servers = getServerIDs(Settings["Server Hop"]["Min Players"], Settings["Server Hop"]["Max Players"])
+                ServerHop(servers)
+            end
+        end
+    end
+end
+
+coi = coroutine.create(function()
+	while true do
+	    checkNearbyPlayers()
+	    wait(1)
+	end
+end)
+coroutine.resume(coi)
 AllNeededCoins = {}
 for i, v in pairs(AllC) do
 	if v.a == "Mystic Mine" then
@@ -1524,7 +1668,6 @@ local equipped = {}
 CoinsLeft = #AllNeededCoins
 for i,v in pairs(AllNeededCoins) do
 	attack_coin(v, equipped)
-	wait(0.02)
 	wait_until_broken(v)
     CoinsLeft = CoinsLeft - 1
 end
@@ -1532,79 +1675,51 @@ wait(1)
 local EndingGems = Library.Save.Get().Diamonds
 GemsEarned = EndingGems - StartingGems
 if not isfile("gemtotal.txt") then writefile("gemtotal.txt", "0") end
-if not isfile("timetotal.txt") then
-    writefile("timetotal.txt", "0") end
-if not isfile("timeframe.txt") then
-    writefile("timeframe.txt", "0")
-end
 TotalGemsEarned = GemsEarned + tonumber(readfile("gemtotal.txt"))
 writefile("gemtotal.txt", tostring(TotalGemsEarned))
-tt = tonumber(readfile("timetotal.txt"))
-tt = tt + TimeElapsed
-writefile("timeframe.txt", tostring(GemsEarned + tonumber(readfile("timeframe.txt"))))
-writefile("timetotal.txt", tostring(tt))
-if tt >= Settings["Webhooks"]["Timeframe"] then
-    writefile("timetotal.txt", "0")
-    pcall(function()
-    request({
-		Url = Settings["Webhooks"]["Time Frame Webhook"],
-        Method = "POST",
-        Headers = {
-            ["Content-Type"] = "application/json"
-        },
-        Body = HttpService:JSONEncode{
-            ["content"] = "",
-            ["embeds"] = {
-			    {
-			      ["title"] = "Time Frame Stat Update (" .. Settings["Webhooks"]["Timeframe"] .. "s)",
-			      ["description"] = "Gem update",
-			      ["color"] = tonumber(0x0f0063),
-			      ["fields"] = {
-			        {
-			          ["name"] = "Stats",
-			          ["value"] = ":gem: **Earnings:** ``".. add_suffix(tonumber(readfile("timeframe.txt"))) .."``"
-			        }
-			      },
-			      ["author"] = {
-			        ["name"] = "Mystic Farmer - Stats"
-			      }
-			    }
-			  }
-			  }
-	})
-	end)
-    writefile("timeframe.txt", "0")
-end
+wait(3)
 pcall(WH)
 wait(1)
 
-function sHopper()
-    local endpoint = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/6284583030/servers/Public?sortOrder=Asc&limit=100'))
-    bestserver = {
-        p = 0
-    }
-    function shuffleTable(tbl)
-        local size = #tbl
-        for i = size, 1, -1 do
-            local rand = math.random(size)
-            tbl[i], tbl[rand] = tbl[rand], tbl[i]
+local function getServerIDs(minPlayers, maxPlayers)
+    local apiUrl = "https://games.roblox.com/v1/games/[GAME_ID]/servers/Public?sortOrder=Asc&limit=100"
+    local gameID = game.PlaceId
+    local serverIDs = {}
+    local nextPageCursor = ""
+    local stopSearching = false
+    
+    repeat
+        local url = apiUrl:gsub("%[GAME_ID%]", gameID)
+        if nextPageCursor ~= "" then
+            url = url .. "&cursor=" .. nextPageCursor
         end
-        return tbl
-    end
-    randomdata = shuffleTable(endpoint.data)
-    for i, v in pairs(randomdata) do
-        if v.playing > bestserver['p'] and v.playing <= 2 then
-            bestserver['id'] = v.id
-            bestserver['p'] = v.playing
+        local response = game:HttpGetAsync(url)
+        local json = game.HttpService:JSONDecode(response)
+        
+        for _, server in ipairs(json.data) do
+            local playerCount = server.playing
+            if playerCount >= minPlayers and playerCount <= maxPlayers then
+                table.insert(serverIDs, server.id)
+            elseif playerCount > maxPlayers then
+                stopSearching = true
+                break
+            end
         end
-    end
-    game:GetService("TeleportService"):TeleportToPlaceInstance(6284583030, bestserver.id, game.Players.LocalPlayer)
+        
+        nextPageCursor = json.nextPageCursor
+    until nextPageCursor == nil or stopSearching
+    
+    return serverIDs
 end
-while 1 do
-    oldid = game.JobId
-    sHopper()
-    task.wait(1)
-    if oldid ~= game.JobId then
-        break
+
+function ServerHop(ServerList)
+    oldJob = game.JobId
+    while 1 do
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, ServerList[math.random(1, #ServerList)], game.Players.LocalPlayer)
+        task.wait(1)
+        if oldJob ~= game.JobId then break end
     end
 end
+
+local servers = getServerIDs(Settings["Server Hop"]["Min Players"], Settings["Server Hop"]["Max Players"])
+ServerHop(servers)
